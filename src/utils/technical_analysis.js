@@ -68,6 +68,7 @@ module.exports = {
       indicators.add('mfi', 'mfi', undefined, { length: 14 });
       indicators.add('bollinger_bands', 'bb', undefined, { length: 20, stddev: 2 });
       indicators.add('stoch_rsi', 'stoch_rsi', undefined, { rsi_length: 14, stoch_length: 14, k: 3, d: 3 });
+      indicators.add('stoch', 'stoch', undefined, { length: 14, k: 3, d: 3 });
       indicators.add('wicked', 'wicked');
       
       const results = this.createIndicatorsLookback(lookbacks, indicators.all());

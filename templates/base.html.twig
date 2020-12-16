@@ -29,7 +29,7 @@
                                         <th class="th-hidden" colspan="3" scope="col"></th>
 
                                         {% for period in periods %}
-                                            <th class="text-center period-start" scope="col" colspan="10">{{ period }}</th>
+                                            <th class="text-center period-start" scope="col" colspan="11">{{ period }}</th>
                                         {% endfor %}
                                     </tr>
 
@@ -49,6 +49,7 @@
                                             <th class="text-uppercase" scope="col">macd</th>
                                             <th class="text-uppercase" scope="col">mfi</th>
                                             <th class="text-uppercase" scope="col">bb</th>
+                                            <th class="text-uppercase" scope="col">kdj</th>
                                         {% endfor %}
                                     </tr>
 
@@ -112,6 +113,16 @@
                                                     {% if ta.bollinger_bands.percent > 5 and ta.bollinger_bands.percent < 50 %}text-warning{% endif %}
                                                     {% if ta.bollinger_bands.percent > 50 and ta.bollinger_bands.percent < 95 %}text-orange{% endif %}
                                                     ">{{ ta.bollinger_bands.percent|round }} % </td>
+                                                
+                                                <td>
+                                                    {% if ta.stoch.value.stoch_k >= 80 and ta.stoch.value.stoch_d >= 80 %}
+                                                        <i data-toggle="tooltip" title="{{ ta.stoch.value.stoch_k|round(2) }}" class="far fa-circle text-danger"></i>
+                                                    {% elseif ta.stoch.value.stoch_k <= 20 and ta.stoch.value.stoch_d <= 20 %}
+                                                        <i data-toggle="tooltip" title="{{ ta.stoch.value.stoch_k|round(2) }}" class="far fa-circle text-success"></i>
+                                                    {% else %}
+                                                        <i data-toggle="tooltip" title="{{ ta.stoch.value.stoch_k|round(2) }}" class="far fa-arrow-alt-circle-up {{ ta.stoch.value.stoch_k >= ta.stoch.value.stoch_d ? 'trend-up text-success' : 'trend-down text-danger' }}"></i>
+                                                    {% endif %}
+                                                </td>
                                             {% endfor %}
                                         </tr>
                                     {% endfor %}
