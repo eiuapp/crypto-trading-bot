@@ -182,7 +182,13 @@ module.exports = class TickListener {
       me.logger.info(`Strategy: "${type.name}" found "${type.items.length}" valid symbols`);
 
       type.items.forEach(symbol => {
-        symbol.strategies.forEach(strategy => {
+        let myStrategies = symbol.strategies;
+        if (type.name === 'trade'){
+          myStrategies = symbol.trade.strategies;
+        } else {
+          myStrategies = symbol.strategies;
+        }
+        myStrategies.forEach(strategy => {
           let myInterval = '1m';
 
           if (strategy.interval) {
