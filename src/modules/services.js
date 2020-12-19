@@ -689,11 +689,49 @@ module.exports = {
 
     const config = this.getConfig();
 
+    /*
     return mail.createTransport(
       `smtps://${config.notify.mail.username}:${config.notify.mail.password}@${config.notify.mail.server}:${config
         .notify.mail.password || 465}`,
       {
         from: config.notify.mail.username
+      }
+    );
+    */
+
+    /*
+    return mail.createTransport(
+      {      
+        // host: 'smtp.qq.email',
+        service: "QQ", // 使用了内置传输发送邮件 查看支持列表：https://nodemailer.com/smtp/well-known/
+        port: "465",  // 465 SMTP 端口 
+        secureConnection: true, // 使用了 SSL
+        auth: {
+          // "user": "766529074@qq.com",
+          // "pass": "nczzcqqjyjjrbddj" // the 766529074 auth password is wrong
+          "user": "273412935@qq.com",
+          "pass": "ahnnvkydhatkbiji"
+        },
+      },
+      {
+        from: "273412935@qq.com"
+      }
+    );
+    */
+
+    return mail.createTransport(
+      {      
+        // host: 'smtp.ethereal.email'
+        service: config.notify.mail.service, // 使用了内置传输发送邮件 查看支持列表：https://nodemailer.com/smtp/well-known/
+        port: config.notify.mail.port, // 465 SMTP 端口
+        secureConnection: config.notify.mail.secureConnection, // true, // 使用了 SSL
+        auth: {
+          user: config.notify.mail.auth.user,
+          pass: config.notify.mail.auth.pass,
+        },
+      },
+      {
+        from: config.notify.mail.auth.user
       }
     );
   },
