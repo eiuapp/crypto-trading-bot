@@ -36,6 +36,10 @@ module.exports = class TickListener {
       return;
     }
 
+    if (strategy.hasOwnProperty('symbols') && !strategy.symbols.includes(symbol.symbol)){
+      return;
+    }
+
     const strategyKey = strategy.strategy;
 
     let context = StrategyContext.create(ticker);
@@ -100,6 +104,10 @@ module.exports = class TickListener {
       return;
     }
 
+    if (strategy.hasOwnProperty('symbols') && !strategy.symbols.includes(symbol.symbol)){
+      return;
+    }
+    
     const strategyKey = strategy.strategy;
 
     let context = StrategyContext.create(ticker);
