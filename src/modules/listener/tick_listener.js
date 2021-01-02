@@ -37,6 +37,7 @@ module.exports = class TickListener {
     }
 
     if (strategy.hasOwnProperty('symbols') && !strategy.symbols.includes(symbol.symbol)){
+      console.error(`The config strategy.symbols(${JSON.stringify(strategy.symbols)}) no found for + ${symbol.exchange}${symbol.symbol}`);
       return;
     }
 
@@ -105,6 +106,7 @@ module.exports = class TickListener {
     }
 
     if (strategy.hasOwnProperty('symbols') && !strategy.symbols.includes(symbol.symbol)){
+      console.error(`The config strategy.symbols(${JSON.stringify(strategy.symbols)}) no found for + ${symbol.exchange}${symbol.symbol}`);
       return;
     }
     
@@ -261,6 +263,9 @@ module.exports = class TickListener {
         break;
       case 'm':
         myUnit = 60;
+        break;
+      case 'h':
+        myUnit = 3600;
         break;
       default:
         throw Error(`Unsupported period unit: ${period}`);

@@ -192,6 +192,21 @@ module.exports = class StrategyManager {
         }
 
         const indicators = periodGroup.filter(group => !group.options.exchange && !group.options.symbol);
+        console.log(` createIndicatorsLookback => indicators : ${JSON.stringify(indicators)}` )
+        const lookbacksArg = lookbacks[exchange].slice().reverse()
+
+        // 修复一下。有的时候，会取不出数据，导致最的一根bar的数据是已收盘数据，而不是最新的不使用数据bar
+        const before = lookbacksArg.slice(-2)[0]
+        const last = lookbacksArg.slice(-1)[0]
+        const lastTime = last.time
+        const beforeTime = before.time
+        let lookbacksCandleSticks = lookbacksArg;
+        if (this._isLossPeriod(lastTime, beforeTime)) {
+          console.log(` getTaResult => _isLossPeriod indicators : ${JSON.stringify(indicators)}` )
+          lookbacksCandleSticks.push(last)
+        }
+        // const result = await ta.createIndicatorsLookback(lookbacks[exchange].slice().reverse(), indicators);
+        const result = await ta.createIndicatorsLookback(lookbacksCandleSticks, indicators);
 
         const result = await ta.createIndicatorsLookback(lookbacks[exchange].slice().reverse(), indicators);
 
@@ -296,5 +311,29 @@ module.exports = class StrategyManager {
     }
 
     return typeof strategy.getBacktestColumns !== 'undefined' ? strategy.getBacktestColumns() : [];
+  }
+  
+  _isLossPeriod(lastTime, beforeTime){
+    const moment = require('moment');
+    if ((''+lastTime).length < 13) { // 如果说不是毫秒，转成毫秒
+      lastTime = lastTime * 1000
+      beforeTime = beforeTime * 1000
+    }
+    const last= moment(moment(lastTime).format());
+    const before = moment(moment(beforeTime).format());
+    const now = moment();
+    const periodDiff = last.diff(before, 'minutes');
+    const nowDiff = now.diff(last, 'minutes');
+    if ( Math.abs(nowDiff) > Math.abs(periodDiff)){
+      // console.log(typeof(nowDiff));
+      // console.log(` _isLossPeriod => lastTime: ${JSON.stringify(lastTime)}`)
+      // console.log(` _isLossPeriod => beforeTime: ${JSON.stringify(beforeTime)}`)
+      // console.log(` _isLossPeriod => now: ${JSON.stringify(now)}`)
+      // console.log(` _isLossPeriod => periodDiff: ${JSON.stringify(periodDiff)}`)
+      // console.log(` _isLossPeriod => nowDiff: ${JSON.stringify(nowDiff)}`)
+      return true
+    } else {
+      return false
+    }
   }
 };
