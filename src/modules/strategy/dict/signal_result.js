@@ -35,11 +35,13 @@ module.exports = class SignalResult {
   }
 
   static createSignal(signal, debug = {}) {
+    console.log(" signal_result.js createSignal => start ")
     const result = new SignalResult();
 
     result.setSignal(signal);
     result.mergeDebug(debug);
 
+    console.log(" signal_result.js createSignal => end ")
     return result;
   }
 

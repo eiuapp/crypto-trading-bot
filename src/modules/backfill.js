@@ -25,6 +25,10 @@ module.exports = class Backfill {
         return ExchangeCandlestick.createFromCandle(exchangeName, symbol, period, candle);
       });
 
+      const moment = require('moment');
+      const now = moment().utcOffset('+0800').format('MM-DD HH:mm:ss')
+      console.log(`[${now}] modules/backfill.js => backfill insertCandles start...`)
+
       await this.candleImporter.insertCandles(exchangeCandlesticks);
 
       console.log(`Got: ${candles.length} candles`);

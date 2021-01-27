@@ -242,3 +242,12 @@ Temporary Items
 /bot.db
 /bot.db-shm
 /bot.db-wal
+
+/bot2.db
+/bot2.db-shm
+/bot2.db-wal
+/bot3.db
+z.js
+
+*.bak.js
+*.bak

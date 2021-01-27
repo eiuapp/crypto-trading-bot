@@ -29,12 +29,15 @@ module.exports = class PairState {
    * @returns {PairState}
    */
   static createLong(exchange, symbol, capital, options, adjustedPrice, clearCallback) {
+    
+    console.log(` dist/pair_state.js createLong => start capital: ${JSON.stringify(capital)}`)
     if (!(capital instanceof OrderCapital)) {
       throw new Error('TypeError: invalid OrderCapital');
     }
 
     const state = new PairState(exchange, symbol, PairState.STATE_LONG, options, adjustedPrice, clearCallback);
     state.capital = capital;
+    console.log(` dist/pair_state.js createLong => end!~ `)
     return state;
   }
 

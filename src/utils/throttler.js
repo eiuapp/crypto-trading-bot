@@ -23,6 +23,7 @@ module.exports = class Throttler {
         await func();
       } catch (e) {
         me.logger.error(`Task error: ${key} - ${String(e)}`);
+        console.log(`Task error: ${key} - ${String(e)} - ${func.constructor.name}`);
       }
     }, timeout);
   }

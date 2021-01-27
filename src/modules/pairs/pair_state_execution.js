@@ -259,6 +259,7 @@ module.exports = class PairStateExecution {
    * @param pair {PairState}
    */
   async pairStateExecuteOrder(pair) {
+    console.log(` pairs.pair_state_execution.js pairStateExecuteOrder => start`)
     const exchangeName = pair.getExchange();
     const symbol = pair.getSymbol();
     const side = pair.getState();
@@ -281,7 +282,9 @@ module.exports = class PairStateExecution {
       options && options.market === true
         ? Order.createMarketOrder(symbol, orderSize)
         : Order.createLimitPostOnlyOrderAutoAdjustedPriceOrder(symbol, orderSize);
-
+        
+    console.log(` pairs.pair_state_execution.js pairStateExecuteOrder => end`)
+    
     return this.orderExecutor.executeOrder(exchangeName, myOrder);
   }
 
