@@ -7,7 +7,7 @@ const Backfill = require('./src/command/backfill.js');
 const services = require('./src/modules/services');
 
 program
-  .command('trade')
+  .command('trade8082')
   .description('start crypto trading bot')
   .option('-i, --instance <file>', 'Instance to start', 'instance.json')
   .action(async options => {

@@ -14,6 +14,11 @@ module.exports = class PairStateManager {
   }
 
   update(exchange, symbol, state, options = {}) {
+
+    console.log(` class PairStateManager update start:`)
+    console.log(` class PairStateManager update exchange: ${JSON.stringify(exchange)}`)
+    console.log(` class PairStateManager update symbol: ${JSON.stringify(symbol)}`)
+    console.log(` class PairStateManager update state: ${JSON.stringify(state)}`)
     if (!['long', 'close', 'short', 'cancel'].includes(state)) {
       this.logger.error(`Invalidate state: ${state}`);
       throw new Error(`Invalidate state: ${state}`);
@@ -29,6 +34,7 @@ module.exports = class PairStateManager {
       const capital = this.pairConfig.getSymbolCapital(exchange, symbol);
       if (!(capital instanceof OrderCapital)) {
         this.logger.error(`Invalidate OrderCapital: ${exchange} - ${symbol} - ${state}`);
+        console.log(`Invalidate OrderCapital: ${exchange} - ${symbol} - ${state}`);
         return;
       }
 

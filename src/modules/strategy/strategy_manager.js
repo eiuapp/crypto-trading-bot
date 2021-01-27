@@ -192,8 +192,49 @@ module.exports = class StrategyManager {
         }
 
         const indicators = periodGroup.filter(group => !group.options.exchange && !group.options.symbol);
+        // console.log(` getTaResult => lookbacks[exchange].slice().reverse(): ${JSON.stringify(lookbacks[exchange].slice().reverse())}` )
+        // console.log(` getTaResult => indicators : ${JSON.stringify(indicators)}` )
+        console.log( new Date() )
+        console.log(` createIndicatorsLookback => indicators : ${JSON.stringify(indicators)}` )
+        const lookbacksArg = lookbacks[exchange].slice().reverse()
+        console.log(` createIndicatorsLookback => lookbacks 1 : ${JSON.stringify(lookbacksArg[1])}` )
+        console.log(` createIndicatorsLookback => lookbacks 2 : ${JSON.stringify(lookbacksArg[2])}` )
+        console.log(` createIndicatorsLookback => lookbacks -3 : ${JSON.stringify(lookbacksArg.slice(-3)[0])}` )
+        console.log(` createIndicatorsLookback => lookbacks -2 : ${JSON.stringify(lookbacksArg.slice(-2)[0])}` )
+        console.log(` createIndicatorsLookback => lookbacks -1 : ${JSON.stringify(lookbacksArg.slice(-1)[0])}` )
 
-        const result = await ta.createIndicatorsLookback(lookbacks[exchange].slice().reverse(), indicators);
+        // 修复一下。有的时候，会取不出数据，导致最的一根bar的数据是已收盘数据，而不是最新的不使用数据bar
+        const before = lookbacksArg.slice(-2)[0]
+        const last = lookbacksArg.slice(-1)[0]
+        const lastTime = last.time
+        const beforeTime = before.time
+        let lookbacksCandleSticks = lookbacksArg;
+        if (this._isLossPeriod(lastTime, beforeTime)) {
+          console.log(` getTaResult => _isLossPeriod indicators : ${JSON.stringify(indicators)}` )
+          lookbacksCandleSticks.push(last)
+        }
+        // const result = await ta.createIndicatorsLookback(lookbacks[exchange].slice().reverse(), indicators);
+        const result = await ta.createIndicatorsLookback(lookbacksCandleSticks, indicators);
+        
+        // console.log(new Date())
+        // console.log(` getTaResult => result cci : ${JSON.stringify(result)}` )
+        
+        let { keys, values, entries } = Object;
+        for(let [k , v] of entries(result)){
+          console.log(k);
+          console.log(` getTaResult => result indicator key : ${JSON.stringify(k)}` )
+          console.log(` getTaResult => result indicator 1 : ${JSON.stringify(v[1])}` )
+          console.log(` getTaResult => result indicator 2 : ${JSON.stringify(v[2])}` )
+          console.log(` getTaResult => result indicator -3 : ${JSON.stringify(v.slice(-3)[0])})}` )
+          console.log(` getTaResult => result indicator -2 : ${JSON.stringify(v.slice(-2)[0])})}` )
+          console.log(` getTaResult => result indicator -1 : ${JSON.stringify(v.slice(-1)[0])})}` )
+        }
+
+        // console.log(` getTaResult => result cci 1 : ${JSON.stringify(result['cci'][1])}` )
+        // console.log(` getTaResult => result cci 2 : ${JSON.stringify(result['cci'][2])}` )
+        // console.log(` getTaResult => result cci -3 : ${JSON.stringify(result['cci'].slice(-3)[0])}` )
+        // console.log(` getTaResult => result cci -2 : ${JSON.stringify(result['cci'].slice(-2)[0])}` )
+        // console.log(` getTaResult => result cci -1 : ${JSON.stringify(result['cci'].slice(-1)[0])}` )
 
         // array merge
         for (const x in result) {
@@ -296,5 +337,29 @@ module.exports = class StrategyManager {
     }
 
     return typeof strategy.getBacktestColumns !== 'undefined' ? strategy.getBacktestColumns() : [];
+  }
+  
+  _isLossPeriod(lastTime, beforeTime){
+    const moment = require('moment');
+    if ((''+lastTime).length < 13) { // 如果说不是毫秒，转成毫秒
+      lastTime = lastTime * 1000
+      beforeTime = beforeTime * 1000
+    }
+    const last= moment(moment(lastTime).format());
+    const before = moment(moment(beforeTime).format());
+    const now = moment();
+    const periodDiff = last.diff(before, 'minutes');
+    const nowDiff = now.diff(last, 'minutes');
+    if ( Math.abs(nowDiff) > Math.abs(periodDiff)){
+      // console.log(typeof(nowDiff));
+      console.log(` _isLossPeriod => lastTime: ${JSON.stringify(moment(lastTime).utcOffset('+0800').format())}`)
+      console.log(` _isLossPeriod => beforeTime: ${JSON.stringify(moment(beforeTime).utcOffset('+0800').format())}`)
+      console.log(` _isLossPeriod => now: ${JSON.stringify(moment(now).utcOffset('+0800').format())}`)
+      console.log(` _isLossPeriod => periodDiff: ${JSON.stringify(periodDiff)}`)
+      console.log(` _isLossPeriod => nowDiff: ${JSON.stringify(nowDiff)}`)
+      return true
+    } else {
+      return false
+    }
   }
 };

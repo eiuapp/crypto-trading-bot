@@ -29,6 +29,7 @@ module.exports = class TickListener {
   }
 
   async visitStrategy(strategy, symbol) {
+    console.log(` visitStrategy => start .............................. `);
     const ticker = this.tickers.get(symbol.exchange, symbol.symbol);
 
     if (!ticker) {
@@ -37,6 +38,8 @@ module.exports = class TickListener {
     }
 
     if (strategy.hasOwnProperty('symbols') && !strategy.symbols.includes(symbol.symbol)){
+      console.error(`The config strategy.symbols(${JSON.stringify(strategy.symbols)}) no found for + ${symbol.exchange}${symbol.symbol}`);
+      console.log(` visitStrategy => !strategy.symbols.includes(symbol.symbol): ${!strategy.symbols.includes(symbol.symbol)} `);
       return;
     }
 
@@ -79,7 +82,14 @@ module.exports = class TickListener {
       // console.log('blocked')
     } else {
       this.notified[symbol.exchange + symbol.symbol + strategyKey] = new Date();
-      this.notifier.send(`[${signal} (${strategyKey})` + `] ${symbol.exchange}:${symbol.symbol} - ${ticker.ask}`);
+      // this.notifier.send(`[${signal} (${strategyKey})` + `] ${symbol.exchange}:${symbol.symbol} - ${ticker.ask}`);
+      let notifierSendContent = `[${signal} (${strategyKey})] ${symbol.exchange}:${symbol.symbol} - ${ticker.ask}`;
+      if (strategy.options && strategy.options.period) {
+	const period = strategy.options.period;
+        notifierSendContent = `[${period}] => ${notifierSendContent}`;
+      }
+      console.log(`notifierSendContent: ${notifierSendContent}`);
+      this.notifier.send(notifierSendContent);
 
       // log signal
       this.signalLogger.signal(
@@ -97,6 +107,7 @@ module.exports = class TickListener {
   }
 
   async visitTradeStrategy(strategy, symbol) {
+    console.log(` visitTradeStrategy => start .............................. `);
     const ticker = this.tickers.get(symbol.exchange, symbol.symbol);
 
     if (!ticker) {
@@ -105,9 +116,10 @@ module.exports = class TickListener {
     }
 
     if (strategy.hasOwnProperty('symbols') && !strategy.symbols.includes(symbol.symbol)){
+      console.error(`The config strategy.symbols(${JSON.stringify(strategy.symbols)}) no found for + ${symbol.exchange}${symbol.symbol}`);
       return;
     }
-    
+
     const strategyKey = strategy.strategy;
 
     let context = StrategyContext.create(ticker);
@@ -128,6 +140,16 @@ module.exports = class TickListener {
     }
 
     const signal = result.getSignal();
+    console.log(` visitTradeStrategy signal: ${JSON.stringify(signal)}`)
+
+    console.log(` visitTradeStrategy => [${signal} (${strategyKey})] ${symbol.exchange}:${symbol.symbol} - ${ticker.ask}`);
+    // this.notifier.send(`[${signal} (${strategyKey})] ${symbol.exchange}:${symbol.symbol} - ${ticker.ask}`);
+    let notifierSendContent = `[${signal} (${strategyKey})] ${symbol.exchange}:${symbol.symbol} - ${ticker.ask}`;
+    if (strategy.options && strategy.options.period) {
+      notifierSendContent = `Trade => [${period}] => ${notifierSendContent}`;
+    }
+    this.notifier.send(notifierSendContent);
+
     if (!signal || typeof signal === 'undefined') {
       return;
     }
@@ -139,9 +161,13 @@ module.exports = class TickListener {
     const signalWindow = moment()
       .subtract(_.get(symbol, 'trade.signal_slowdown_minutes', 15), 'minutes')
       .toDate();
+    console.log(` visitTradeStrategy signalWindow: ${JSON.stringify(signalWindow)}`)
 
     const noteKey = symbol.exchange + symbol.symbol;
+    console.log(` visitTradeStrategy noteKey: ${JSON.stringify(noteKey)}`)
     if (noteKey in this.notified && this.notified[noteKey] >= signalWindow) {
+      console.log(` visitTradeStrategy noteKey in this.notified && this.notified[noteKey] >= signalWindow: ${JSON.stringify(noteKey in this.notified )}`)
+      console.log(` visitTradeStrategy noteKey in this.notified && this.notified[noteKey] >= signalWindow: ${JSON.stringify(this.notified[noteKey] >= signalWindow)}`)
       return;
     }
 
@@ -149,6 +175,7 @@ module.exports = class TickListener {
     this.logger.info(
       [new Date().toISOString(), signal, strategyKey, symbol.exchange, symbol.symbol, ticker.ask].join(' ')
     );
+    console.log(` visitTradeStrategy notifier.send: [${signal} (${strategyKey})] ${symbol.exchange}:${symbol.symbol} - ${ticker.ask}`)
     this.notifier.send(`[${signal} (${strategyKey})] ${symbol.exchange}:${symbol.symbol} - ${ticker.ask}`);
     this.signalLogger.signal(
       symbol.exchange,
@@ -200,6 +227,8 @@ module.exports = class TickListener {
           let myInterval = '1m';
 
           if (strategy.interval) {
+            console.log(` startStrategyIntervals => strategy: ${JSON.stringify(strategy)} `)
+            console.log(` startStrategyIntervals => strategy.interval: ${JSON.stringify(strategy.interval)} `)
             myInterval = strategy.interval;
           } else {
             const strategyInstance = me.strategyManager.findStrategy(strategy.strategy);
@@ -211,10 +240,19 @@ module.exports = class TickListener {
           const [timeout, interval] = me.getFirstTimeoutAndInterval(myInterval);
 
           // random add 5-15 sec to init start for each to not run all at same time
-          const timeoutWindow = timeout + (Math.floor(Math.random() * 9000) + 5000);
+          const timeoutWindow = timeout + (Math.floor(Math.random() * 9000 * 2) + 25000);
 
           me.logger.info(
             `"${symbol.exchange}" - "${symbol.symbol}" - "${type.name}" init strategy "${strategy.strategy}" in ${(
+              timeoutWindow /
+              60 /
+              1000
+            ).toFixed(3)} minutes`
+          );
+          const moment = require('moment'); 
+          const now = moment().utcOffset('+0800').format('MM-DD HH:mm:ss')
+          console.log(
+            `[${now}] => "${symbol.exchange}" - "${symbol.symbol}" - "${type.name}" init strategy "${strategy.strategy}" in ${(
               timeoutWindow /
               60 /
               1000
@@ -227,6 +265,14 @@ module.exports = class TickListener {
                 strategy.strategy
               }" now every ${(interval / 60 / 1000).toFixed(2)} minutes`
             );
+            
+            const moment = require('moment'); 
+            const now = moment().utcOffset('+0800').format('MM-DD HH:mm:ss')
+            console.log(
+              `[${now}] => "${symbol.exchange}" - "${symbol.symbol}" - "${type.name}" first strategy run "${
+                strategy.strategy
+              }" now every ${(interval / 60 / 1000).toFixed(2)} minutes`
+            );
 
             setInterval(() => {
               queue.add(async () => {
@@ -236,6 +282,11 @@ module.exports = class TickListener {
                   `"${symbol.exchange}" - "${symbol.symbol}" - "${type.name}" strategy running "${strategy.strategy}"`
                 );
                 */
+                // const moment = require('moment'); 
+                const now = moment().utcOffset('+0800').format('MM-DD HH:mm:ss')
+                console.log(
+                  `[${now}] => "${symbol.exchange}" - "${symbol.symbol}" - "${type.name}" strategy running "${strategy.strategy}"`
+                );
 
                 if (type.name === 'watch') {
                   await me.visitStrategy(strategy, symbol);
@@ -262,17 +313,28 @@ module.exports = class TickListener {
       case 'm':
         myUnit = 60;
         break;
+      case 'h':
+        myUnit = 3600;
+        break;
       default:
         throw Error(`Unsupported period unit: ${period}`);
     }
 
     const number = parseInt(period.substring(0, period.length - 1), 10);
-    return [this.getFirstRun(number, myUnit), number * myUnit * 1000];
+    const firstRun = this.getFirstRun(number, myUnit);
+    console.log(` getFirstTimeoutAndInterval => period: ${JSON.stringify(period)}`)
+    console.log(` getFirstTimeoutAndInterval => myUnit: ${JSON.stringify(myUnit)}`)
+    console.log(` getFirstTimeoutAndInterval => number: ${JSON.stringify(number)}`)
+    console.log(` getFirstTimeoutAndInterval => firstRun: ${JSON.stringify(firstRun)}`)
+    console.log(` getFirstTimeoutAndInterval => number * myUnit * 1000: ${JSON.stringify(number * myUnit * 1000)}`)
+    return [firstRun, number * myUnit * 1000];
   }
 
   getFirstRun(minutes, unit) {
     const interval = minutes * unit * 1000;
     const number = Math.ceil(new Date().getTime() / interval) * interval;
+    console.log(` getFirstRun => interval: ${JSON.stringify(interval)}`)
+    console.log(` getFirstRun => number: ${JSON.stringify(number)}`)
     return new Date(number).getTime() - new Date().getTime();
   }
 };

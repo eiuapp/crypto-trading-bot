@@ -67,7 +67,7 @@ module.exports = class CreateOrderListener {
           return;
         }
 
-        console.log(`Order created: ${JSON.stringify(order)}`);
+        console.log(` listener/create_order_listener.js triggerOrder Order created: ${JSON.stringify(order)}`);
       })
       .catch(e => {
         console.log(e);

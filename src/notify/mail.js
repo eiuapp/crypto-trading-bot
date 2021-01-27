@@ -6,12 +6,19 @@ module.exports = class Mail {
   }
 
   send(message) {
+    // console.log(` class Mail send message: ${JSON.stringify(message)}`)
     const to = this.systemUtil.getConfig('notify.mail.to');
     if (!to) {
       this.logger.error('No mail "to" address given');
 
       return;
     }
+    console.log(` class Mail send sendMail: ${JSON.stringify({
+      to: to,
+      subject: message,
+      text: message,
+      requireTLS:true
+    })}`)
 
     this.mailer.sendMail(
       {

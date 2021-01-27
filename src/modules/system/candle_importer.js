@@ -28,6 +28,9 @@ module.exports = class CandleImporter {
   }
 
   async insertCandles(candles) {
+    // const moment = require('moment');
+    // const now = moment().utcOffset('+0800').format('MM-DD HH:mm:ss')
+    // console.log(`[${now}] modules/system/candle_importer.js => insertCandles start...`)
     return this.candlestickRepository.insertCandles(candles);
   }
 

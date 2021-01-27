@@ -72,6 +72,10 @@ module.exports = class CandlestickRepository {
   }
 
   insertCandles(exchangeCandlesticks) {
+    
+    // const moment = require('moment');
+    // const now = moment().utcOffset('+0800').format('MM-DD HH:mm:ss')
+    // console.log(`[${now}] modules/repository/candlestick_repository.js => insertCandles start...`)
     return new Promise(resolve => {
       const upsert = this.db.prepare(
         'INSERT INTO candlesticks(exchange, symbol, period, time, open, high, low, close, volume) VALUES ($exchange, $symbol, $period, $time, $open, $high, $low, $close, $volume) ' +
