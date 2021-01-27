@@ -192,13 +192,11 @@ module.exports = class StrategyManager {
         }
 
         const indicators = periodGroup.filter(group => !group.options.exchange && !group.options.symbol);
+        console.log( new Date() )
         console.log(` createIndicatorsLookback => indicators : ${JSON.stringify(indicators)}` )
         const lookbacksArg = lookbacks[exchange].slice().reverse()
         // console.log(` getTaResult => lookbacks[exchange].slice().reverse(): ${JSON.stringify(lookbacks[exchange].slice().reverse())}` )
         // console.log(` getTaResult => indicators : ${JSON.stringify(indicators)}` )
-        console.log( new Date() )
-        console.log(` createIndicatorsLookback => indicators : ${JSON.stringify(indicators)}` )
-        const lookbacksArg = lookbacks[exchange].slice().reverse()
         console.log(` createIndicatorsLookback => lookbacks 1 : ${JSON.stringify(lookbacksArg[1])}` )
         console.log(` createIndicatorsLookback => lookbacks 2 : ${JSON.stringify(lookbacksArg[2])}` )
         console.log(` createIndicatorsLookback => lookbacks -3 : ${JSON.stringify(lookbacksArg.slice(-3)[0])}` )
