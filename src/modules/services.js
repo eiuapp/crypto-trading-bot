@@ -150,7 +150,7 @@ module.exports = {
       return db;
     }
 
-    const myDb = Sqlite('bot2.db');
+    const myDb = Sqlite('bot.db');
     myDb.pragma('journal_mode = WAL');
 
     myDb.pragma('SYNCHRONOUS = 1;');
