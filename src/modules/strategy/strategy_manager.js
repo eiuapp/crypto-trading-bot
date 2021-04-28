@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const _ = require('lodash');
+const moment = require('moment');
 const IndicatorBuilder = require('./dict/indicator_builder');
 const IndicatorPeriod = require('./dict/indicator_period');
 const ta = require('../../utils/technical_analysis');
@@ -197,11 +198,14 @@ module.exports = class StrategyManager {
         const lookbacksArg = lookbacks[exchange].slice().reverse()
         // console.log(` getTaResult => lookbacks[exchange].slice().reverse(): ${JSON.stringify(lookbacks[exchange].slice().reverse())}` )
         // console.log(` getTaResult => indicators : ${JSON.stringify(indicators)}` )
-        console.log(` createIndicatorsLookback => lookbacks 1 : ${JSON.stringify(lookbacksArg[1])}` )
-        console.log(` createIndicatorsLookback => lookbacks 2 : ${JSON.stringify(lookbacksArg[2])}` )
-        console.log(` createIndicatorsLookback => lookbacks -3 : ${JSON.stringify(lookbacksArg.slice(-3)[0])}` )
-        console.log(` createIndicatorsLookback => lookbacks -2 : ${JSON.stringify(lookbacksArg.slice(-2)[0])}` )
-        console.log(` createIndicatorsLookback => lookbacks -1 : ${JSON.stringify(lookbacksArg.slice(-1)[0])}` )
+        for (let index = 0; index < 6; index++) {
+          let candle = lookbacksArg[index];
+          console.log(` createIndicatorsLookback => lookbacks ${index} : ${moment(candle.time*1000).format()},  ${JSON.stringify(candle)}` )
+        }
+        for (let index = -6; index < 0; index++) {
+          let candle = lookbacksArg.slice(index)[0];
+          console.log(` createIndicatorsLookback => lookbacks ${index} : ${moment(candle.time*1000).format()},  ${JSON.stringify(candle)}` )
+        }
 
         // 修复一下。有的时候，会取不出数据，导致最的一根bar的数据是已收盘数据，而不是最新的不使用数据bar
         const before = lookbacksArg.slice(-2)[0]
@@ -368,3 +372,4 @@ module.exports = class StrategyManager {
     }
   }
 };
+

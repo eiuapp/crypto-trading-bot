@@ -107,7 +107,13 @@ function executeTulindIndicator(source, indicator, tulindOptions) {
 
     // extract indicator source data, for example if sources = ['open', 'high'], then it will map values from candles.
     sources = sources ? sources.map(s => source.map(ss => ss[s])) : [source];
-
+	  /*
+console.log(`indicator: ${JSON.stringify(indicator)}`)
+console.log(`sources: ${sources}`)
+console.log(`sources[0]: ${sources[0]}`)
+// console.log(`sources[1]: ${sources[1]}`)
+// console.log(`sources[-1]: ${sources[-1]}`)
+	  */
     // set default indicator options
     const indicatorOptions = indicator.options || {};
     options = Object.keys(options).map(o => indicatorOptions[o] || options[o]);
