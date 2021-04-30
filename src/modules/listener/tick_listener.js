@@ -88,6 +88,7 @@ module.exports = class TickListener {
         notifierSendContent = `[${period}] => ${notifierSendContent}`;
       }
       console.log(`notifierSendContent: ${notifierSendContent}`);
+      /*
       this.notifier.send(notifierSendContent);
 
       // log signal
@@ -102,6 +103,7 @@ module.exports = class TickListener {
         signal,
         strategyKey
       );
+      */
     } else {
       this.notified[symbol.exchange + symbol.symbol + strategyKey] = new Date();
       // this.notifier.send(`[${signal} (${strategyKey})` + `] ${symbol.exchange}:${symbol.symbol} - ${ticker.ask}`);
