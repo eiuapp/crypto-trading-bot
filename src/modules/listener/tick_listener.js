@@ -79,13 +79,35 @@ module.exports = class TickListener {
       this.notified[symbol.exchange + symbol.symbol + strategyKey] &&
       signalWindow <= this.notified[symbol.exchange + symbol.symbol + strategyKey]
     ) {
-      // console.log('blocked')
+      console.log('notifierSendContent: blocked')
+      this.notified[symbol.exchange + symbol.symbol + strategyKey] = new Date();
+      // this.notifier.send(`[${signal} (${strategyKey})` + `] ${symbol.exchange}:${symbol.symbol} - ${ticker.ask}`);
+      let notifierSendContent = `will blocked => [${signal} (${strategyKey})] ${symbol.exchange}:${symbol.symbol} - ${ticker.ask}`;
+      if (strategy.options && strategy.options.period) {
+	      const period = strategy.options.period;
+        notifierSendContent = `[${period}] => ${notifierSendContent}`;
+      }
+      console.log(`notifierSendContent: ${notifierSendContent}`);
+      this.notifier.send(notifierSendContent);
+
+      // log signal
+      this.signalLogger.signal(
+        symbol.exchange,
+        symbol.symbol,
+        {
+          price: ticker.ask,
+          strategy: strategyKey,
+          raw: JSON.stringify(result)
+        },
+        signal,
+        strategyKey
+      );
     } else {
       this.notified[symbol.exchange + symbol.symbol + strategyKey] = new Date();
       // this.notifier.send(`[${signal} (${strategyKey})` + `] ${symbol.exchange}:${symbol.symbol} - ${ticker.ask}`);
       let notifierSendContent = `[${signal} (${strategyKey})] ${symbol.exchange}:${symbol.symbol} - ${ticker.ask}`;
       if (strategy.options && strategy.options.period) {
-	const period = strategy.options.period;
+	      const period = strategy.options.period;
         notifierSendContent = `[${period}] => ${notifierSendContent}`;
       }
       console.log(`notifierSendContent: ${notifierSendContent}`);
